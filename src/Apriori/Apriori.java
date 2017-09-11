@@ -22,41 +22,59 @@ public class Apriori {
     extends Mapper<Object, Text, Text, IntWritable>{
  private final static IntWritable one = new IntWritable(1);
  private Text word = new Text();
+ private String l = new String();
+ //private StringBuffer t = new StringBuffer();
  private String t = new String();
  private String subsets = new String();
+// private String subs =new String();
+ private static int flag = 0;
  public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
    StringTokenizer itr = new StringTokenizer(value.toString());
    while (itr.hasMoreTokens())
    {
-   t = itr.toString();
-   char [] set = t.toCharArray();
-   int n = set.length;
-   subsets = null;
-   char tmp;
+  // l = itr.nextToken().toString();
+   //t.append(l.split(" "));
+   t = itr.nextToken().toString();
+   int n = t.length();
+   subsets = new String();
+   String[] subs = null;
+   char tmp = '\0';  
+   StringTokenizer st = null;
    for (int i = 0; i < (1<<n); i++)
    {       
-  	 	subsets = null;      
-       for (int j = 0; j < n; j++)          
+	   //subsets = new String();
+	   
+	    subsets += ",";
+  	 	tmp = '\0';
+       for (int j = 0; j < n; j++)  
+       {        
+    	      
+    	       tmp = '\0';
            if ((i & (1 << j)) > 0) 
-           {
-               
-          	 	 tmp = set[j];
-          	 	String s = String.valueOf(tmp);
-          	 word.set(s);
-          	 context.write(word, one);
-       		 //subsets = tmp + subsets;
+           {               
+          	 	 tmp = t.charAt(j);
+       		     subsets += Character.toString(tmp);
            }
-         
-      /* while (subs.hasMoreTokens()) {
-    	     word.set(subs.nextToken());
-    	     context.write(word,one);
-    	   }*/
-      // word.set(subsets.toString());
-       //context.write(word, one);
-        
+          
+       }
        
-      
-   }
+  
+   } 
+    
+   // subs = subsets.split(",");
+      st = new StringTokenizer(subsets, ",");
+    //for (String d : subs) 
+    //{
+   // 	 flag++;
+      //word.set(d);
+   while (st.hasMoreTokens()){
+	   word.set(st.nextToken());
+	   context.write(word,one);
+	    //System.out.println(st.nextToken());
+	}
+    	 // word.set(subsets+" "+Integer.toString(flag));
+     //context.write(word,one);
+    //}
    
  }
  }
@@ -75,11 +93,12 @@ public class Apriori {
    for (IntWritable val : values) {
      sum += val.get();
    }
-   if (sum >= 2) {
+   if (sum >= 3) {
 	   result.set(sum);   
+	   context.write(key, result);
    }
+   //result.set(sum);  
    
-   context.write(key, result);
  }
 }
  
@@ -91,6 +110,8 @@ public static void main(String[] args) throws Exception {
       System.exit(2);
     }
     Job job = new Job(conf, "word count");
+    Path outputPath = new Path(args[1]);
+    outputPath.getFileSystem(conf).delete(outputPath, true);
     job.setJarByClass(Apriori.class);
     job.setMapperClass(TokenizerMapper.class);
    // job.setCombinerClass(IntSumReducer.class);
