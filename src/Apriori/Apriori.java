@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
-
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 import org.apache.commons.logging.Log;
@@ -21,30 +20,48 @@ public class Apriori {
 	public static class TokenizerMapper 
 	
     extends Mapper<Object, Text, Text, IntWritable>{
-
  private final static IntWritable one = new IntWritable(1);
-
  private Text word = new Text();
- public ArrayList<String> itemsets = new ArrayList<String>();
+ private String t = new String();
+ private String subsets = new String();
  public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
    StringTokenizer itr = new StringTokenizer(value.toString());
-   
-   itemsets.add(itr.toString());
-   System.out.println("See here:"+itemsets.toString());
-   int a = 1,r=0;
-   r = add(a);
-   IntWritable ones = new IntWritable(r);
-   while (itr.hasMoreTokens()) {
-     word.set(itr.nextToken());
-     context.write(word,ones);
+   while (itr.hasMoreTokens())
+   {
+   t = itr.toString();
+   char [] set = t.toCharArray();
+   int n = set.length;
+   subsets = null;
+   char tmp;
+   for (int i = 0; i < (1<<n); i++)
+   {       
+  	 	subsets = null;      
+       for (int j = 0; j < n; j++)          
+           if ((i & (1 << j)) > 0) 
+           {
+               
+          	 	 tmp = set[j];
+          	 	String s = String.valueOf(tmp);
+          	 word.set(s);
+          	 context.write(word, one);
+       		 //subsets = tmp + subsets;
+           }
+         
+      /* while (subs.hasMoreTokens()) {
+    	     word.set(subs.nextToken());
+    	     context.write(word,one);
+    	   }*/
+      // word.set(subsets.toString());
+       //context.write(word, one);
+        
+       
+      
    }
+   
  }
- private int add(int n) {
-	 n = n + 90;
-	 return n;
+ }
  }
  
-}
 	
 
  public static class IntSumReducer 
@@ -76,7 +93,7 @@ public static void main(String[] args) throws Exception {
     Job job = new Job(conf, "word count");
     job.setJarByClass(Apriori.class);
     job.setMapperClass(TokenizerMapper.class);
-    job.setCombinerClass(IntSumReducer.class);
+   // job.setCombinerClass(IntSumReducer.class);
     job.setReducerClass(IntSumReducer.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(IntWritable.class);
@@ -84,6 +101,6 @@ public static void main(String[] args) throws Exception {
     FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
     System.exit(job.waitForCompletion(true) ? 0 : 1);
     
-   
-  }
 }
+  }
+
