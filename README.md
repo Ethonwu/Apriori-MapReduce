@@ -28,7 +28,7 @@ Subsets:
 
 #### Map part
 
-To generate every subsets in each transcation list and output <itemset,1> 
+To generate every subsets in each transcation list and output <subset,1> 
 
 **Input:**
 
