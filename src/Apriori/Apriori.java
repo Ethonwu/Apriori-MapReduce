@@ -42,9 +42,9 @@ public class Apriori {
    StringTokenizer st = null;
    for (int i = 0; i < (1<<n); i++)
    {       
-	   //subsets = new String();
-	   
-	    subsets += ",";
+	   subsets = new String();
+	   subsets = "[";
+	   // subsets += ",";
   	 	tmp = '\0';
        for (int j = 0; j < n; j++)  
        {        
@@ -53,25 +53,27 @@ public class Apriori {
            if ((i & (1 << j)) > 0) 
            {               
           	 	 tmp = t.charAt(j);
-       		     subsets += Character.toString(tmp);
+       		     subsets = subsets + Character.toString(tmp) + " ";
            }
           
        }
+       subsets += "]";
+       word.set(subsets);
+       context.write(word, one);
        
   
    } 
     
    // subs = subsets.split(",");
-      st = new StringTokenizer(subsets, ",");
+   //   st = new StringTokenizer(subsets, ",");
     //for (String d : subs) 
     //{
    // 	 flag++;
       //word.set(d);
-   while (st.hasMoreTokens()){
-	   word.set(st.nextToken());
-	   context.write(word,one);
-	    //System.out.println(st.nextToken());
-	}
+   //while (st.hasMoreTokens()){
+	 //  word.set(st.nextToken());
+	   //context.write(word,one);
+	//}
     	 // word.set(subsets+" "+Integer.toString(flag));
      //context.write(word,one);
     //}
