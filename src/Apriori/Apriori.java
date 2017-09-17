@@ -35,15 +35,24 @@ public class Apriori {
   // l = itr.nextToken().toString();
    //t.append(l.split(" "));
    t = itr.nextToken().toString();
-   int n = t.length();
+   int list_l = t.length();
+   StringTokenizer st = new StringTokenizer(t, ",");
+   int[] list = new int[list_l];
+   int k = 0;
+   while (st.hasMoreTokens()){
+	  // word.set("Test:"+st.nextToken().toString());
+       //context.write(word, one);
+	    list[k] = Integer.valueOf(st.nextToken());
+	    k++;
+	}
+   //int n = t.length();
+   int n = k;
    subsets = new String();
-   String[] subs = null;
    char tmp = '\0';  
-   StringTokenizer st = null;
    for (int i = 0; i < (1<<n); i++)
    {       
 	   subsets = new String();
-	   subsets = "[";
+	   subsets = "";
 	   // subsets += ",";
   	 	tmp = '\0';
        for (int j = 0; j < n; j++)  
@@ -52,31 +61,27 @@ public class Apriori {
     	       tmp = '\0';
            if ((i & (1 << j)) > 0) 
            {               
-          	 	 tmp = t.charAt(j);
-       		     subsets = subsets + Character.toString(tmp) + " ";
+          	 	 //tmp = Integer.(list[j]);
+       		  //   subsets = subsets + Character.toString(tmp) + " ";
+        	   		   if(subsets == "")
+        	   		   {
+        	   			   subsets = subsets + Integer.toString(list[j]);
+        	   			   
+        	   		   }
+        	   		   else 
+        	   		   {
+        	   		     subsets = subsets +"," + Integer.toString(list[j]);
+        	   		   }
            }
           
        }
-       subsets += "]";
+      // subsets += "";
        word.set(subsets);
        context.write(word, one);
        
   
    } 
     
-   // subs = subsets.split(",");
-   //   st = new StringTokenizer(subsets, ",");
-    //for (String d : subs) 
-    //{
-   // 	 flag++;
-      //word.set(d);
-   //while (st.hasMoreTokens()){
-	 //  word.set(st.nextToken());
-	   //context.write(word,one);
-	//}
-    	 // word.set(subsets+" "+Integer.toString(flag));
-     //context.write(word,one);
-    //}
    
  }
  }
@@ -92,15 +97,16 @@ public class Apriori {
                     Context context
                     ) throws IOException, InterruptedException {
    int sum = 0;
+  
    for (IntWritable val : values) {
-     sum += val.get();
-   }
+		     sum += val.get();
+		   }
    if (sum >= 3) {
-	   result.set(sum);   
-	   context.write(key, result);
-   }
-   //result.set(sum);  
+			   result.set(sum);   
+			   context.write(key, result);
+		   }
    
+  
  }
 }
  

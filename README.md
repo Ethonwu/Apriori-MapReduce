@@ -33,7 +33,7 @@ To generate every subsets in each transcation list and output <subset,1>
 **Input:**
 
 	Itemset from transcation list
-	
+
 **Decompose** part referencer [here](http://www.geeksforgeeks.org/finding-all-subsets-of-a-given-set-in-java/ "Title")
 
 **Output:**
