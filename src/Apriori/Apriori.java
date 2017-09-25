@@ -40,8 +40,8 @@ public class Apriori {
    int[] list = new int[list_l];
    int k = 0;
    while (st.hasMoreTokens()){
-	  // word.set("Test:"+st.nextToken().toString());
-       //context.write(word, one);
+	 //  word.set("Test:"+st.nextToken().toString());
+      // context.write(word, one);
 	    list[k] = Integer.valueOf(st.nextToken());
 	    k++;
 	}
@@ -101,7 +101,7 @@ public class Apriori {
    for (IntWritable val : values) {
 		     sum += val.get();
 		   }
-   if (sum >= 3) {
+   if (sum >= 4) {
 			   result.set(sum);   
 			   context.write(key, result);
 		   }
