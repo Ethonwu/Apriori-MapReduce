@@ -1,4 +1,6 @@
 package Apriori;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
@@ -14,13 +16,32 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 public class Apriori {
 	public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable>
+	
  {
      private final static IntWritable one = new IntWritable(1);
      private Text word = new Text();
      private String t = new String();
      private String subsets = new String();
+     
+   /*  public void setup(Context context) throws IOException
+     {
+    	   //Add Feature for read file
+         Path pt = new Path("hdfs:/ethonwu/Anotherfile.txt"); //Location on HDFS
+         FileSystem fs = FileSystem.get(new Configuration());
+         BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
+         String line;
+         line = br.readLine();
+         while(line!=null)
+         {
+        	   
+         }
+         //end
+     }*/
+     
+    
      public void map(Object key, Text value, Context context) throws IOException, InterruptedException 
       {
+    	 
         StringTokenizer itr = new StringTokenizer(value.toString());
         while (itr.hasMoreTokens())
           {
@@ -67,6 +88,21 @@ public class Apriori {
     
    
              }
+        /*
+        //Add Feature for read file
+        Path pt = new Path("hdfs:/ethonwu/Anotherfile.txt"); //Location on HDFS
+        FileSystem fs = FileSystem.get(new Configuration());
+        BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
+        String line;
+        line = br.readLine();
+        while(line!=null)
+        {
+       	//   word.set(line);
+       	 //  context.write(word,one);
+       	   line = br.readLine();
+        }
+        //end
+         * */
         }
       }
  
@@ -75,8 +111,13 @@ public class Apriori {
  public static class IntSumReducer extends Reducer<Text,IntWritable,Text,IntWritable> 
   {
 	 private IntWritable result = new IntWritable();
-     public void reduce(Text key, Iterable<IntWritable> values,Context context)throws IOException, InterruptedException 
+	 private IntWritable test = new IntWritable(10);
+     public void reduce(Text key, Iterable<IntWritable> values,Context context)throws IOException, InterruptedException
+    
      {
+    	   
+    	    
+     
        int sum = 0; 
        for (IntWritable val : values) 
        {
@@ -85,10 +126,10 @@ public class Apriori {
        if (sum >= 3) 
        {
 	      result.set(sum);   
-	      context.write(key, result);
-	    }
+	     context.write(key, result);
+	   }
    
-  
+        
       }
    }
  
@@ -105,9 +146,11 @@ public static void main(String[] args) throws Exception {
     outputPath.getFileSystem(conf).delete(outputPath, true);
     job.setJarByClass(Apriori.class);
     
+    
     job.setMapperClass(TokenizerMapper.class);
    // job.setCombinerClass(IntSumReducer.class);
     job.setReducerClass(IntSumReducer.class);
+   
     
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(IntWritable.class);
