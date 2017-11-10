@@ -1,7 +1,10 @@
 package Apriori;
 import java.io.BufferedReader;
+import java.util.*;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -15,13 +18,16 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
+
+
 public class Apriori {
 	public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> 
 {
-     private final static IntWritable one = new IntWritable(1);
+     private final static IntWritable one = new IntWritable();
      private Text word = new Text();
      private String t = new String();
      private String subsets = new String();
+     
      
      //Get conf from main function
    //  static Configuration test;
@@ -48,6 +54,8 @@ public class Apriori {
     	   // Path pt = new Path("hdfs:/ethonwu/A.txt");
     	    //FileSystem fs = FileSystem.get(test);
     	    //FSDataOutputStream fsout = fs.create(pt);
+    	    Map<String, List<String>> tmpList = new HashMap<String, List<String>>(); 
+    	    
         StringTokenizer itr = new StringTokenizer(value.toString());
         while (itr.hasMoreTokens())
           {
@@ -56,6 +64,7 @@ public class Apriori {
               StringTokenizer st = new StringTokenizer(t, ",");
               int[] list = new int[list_l];
               int k = 0;
+              
               while (st.hasMoreTokens())
               {  
             	     // Word count here
@@ -64,14 +73,29 @@ public class Apriori {
 	            list[k] = Integer.valueOf(st.nextToken());
 	            k++;
 	          }
-             
+             for(int i=1;i<k;i++) {
+            	 List<String> people = new ArrayList<String>();
+             }
+              /*
+              for(int i=1;i<=k;i++) {
+            	  word.set(Integer.toString(i));
+            	  context.write(word, one);
+              }*/
+                            
+            //  String[][] Subests_Array = new String[k][k];
+             // int[] Array_index = new int[k];
+              //for(int index = 0 ; index<k ; index++) {
+            	    //Array_index[index] = 0;
+              //}
              int n = k;
              subsets = new String();
              char tmp = '\0';  
+            // for(int l = 0 ; l<k ; l++) {
              for (int i = 0; i < (1<<n); i++)
               {       
 	             subsets = new String();
 	             subsets = "";
+	             int flag = 0;
 	             tmp = '\0';
                  for (int j = 0; j < n; j++)  
                   {        
@@ -87,18 +111,38 @@ public class Apriori {
                     	   else 
         	   		        {
         	   		          subsets = subsets +"," + Integer.toString(list[j]);
+        	   		          flag++;
         	   		         }
                     	
                       }
                     }
-             //  fsout.writeUTF(subsets);  
-                 if (!"".equals(subsets)) {
-                  word.set(subsets);
-                  context.write(word, one);
-                 }
               
+                 if (!"".equals(subsets)) {
+                	// if(l==flag) {
+                		     word.set(subsets);
+                		   //  one.set(flag+1);
+                         context.write(word, new IntWritable(1));
+                	 //}
+              //  	 Subests_Array[flag][Array_index[flag]++] = subsets;
+                	    
+                	  }
+                	   
+                	 
+                //  word.set(subsets);
+                //  context.write(word, one);
+                 }
+             //}
+               //  for(int len=0;len<k;len++) {
+                	 // for(int y=0 ; y <=Array_index[len];y++) {
+                		//  word.set(Subests_Array[len][y]);
+                		  //context.write(word, one);
+                	 // }
+                	 
+                // }
+                 
                 }
-             
+      
+         //  fsout.writeUTF(subsets); 
              //fsout.flush();
              //fsout.sync();
              //fsout.close();
@@ -107,7 +151,7 @@ public class Apriori {
              }
        
         }
-      }
+      
 	public static class IntSumCombiner extends Reducer<Text,IntWritable,Text,IntWritable> 
 	  {
 		 private IntWritable pre_result = new IntWritable();
@@ -120,11 +164,12 @@ public class Apriori {
 	       int sum = 0; 
 	       for (IntWritable val : values) 
 	       {
-			 sum += val.get();
+			     context.write(key,new IntWritable(val.get()));
 	       }
-	       pre_result.set(sum);
-	       context.write(key, pre_result);
-	    	
+	     //  if (sum >= 3) {
+	      // pre_result.set(sum);
+	       //context.write(key, pre_result);
+	       //}
 	      
 	       
 	        
@@ -212,6 +257,32 @@ public static void main(String[] args) throws Exception {
     
     
     System.exit(job.waitForCompletion(true) ? 0 : 1);
+    /*
+    while(job.waitForCompletion(true)) {}
+    Path pt = new Path(args[1]); //Location on HDFS
+    FileSystem fs = FileSystem.get(new Configuration());
+    BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
+    String line;
+    line = br.readLine();
+    int[] list = new int[line.length()];
+    ArrayList<Integer> key_list = new ArrayList<>();
+    ArrayList<Integer> value_list = new ArrayList<>();
+    int k=0;
+    while(line!=null)
+    {
+    	  StringTokenizer st = new StringTokenizer(line, ",");
+    	  while (st.hasMoreTokens())
+          {  
+            list[k] = Integer.valueOf(st.nextToken());
+            k++;
+          }
+    	  key_list.add(list[0]);
+    	  value_list.add(list[1]);
+    	  
+    }
+    Collections.sort(key_list);
+    */
+   
     
 }
   }
